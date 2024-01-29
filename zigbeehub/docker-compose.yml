@@ -1,0 +1,45 @@
+# sudo docker compose up -d
+# sudo docker compose down
+
+version: '3.8'
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    volumes:
+      - "./mosquitto-data:/mosquitto"
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    command: "mosquitto -c /mosquitto-no-auth.conf"
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - ./zigbee2mqtt-data:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      - 8001:8800
+    environment:
+      - TZ=Europe/Berlin
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+
+  openhab:
+    image: openhab/openhab:3.1.0
+    restart: unless-stopped
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "./openhab-conf:/openhab/conf"
+      - "./openhab-userdata:/openhab/userdata"
+      - "./openhab-addons:/openhab/addons"
+    ports:
+      - "9005:9005"
+      - "9006:8443"
+    environment:
+      - USER_ID=9001
+      - GROUP_ID=9001
+      - TZ=Europe/Berlin

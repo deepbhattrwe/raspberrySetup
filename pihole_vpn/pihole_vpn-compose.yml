@@ -1,0 +1,57 @@
+"""
+Create pihole.env file with the following content:
+TZ=Europe/Berlin
+WEBPASSWORD=<your password>
+"""
+# docker stack deploy -c pihole_vpn/pihole_vpn-compose.yml pihole_vpn
+
+version: '3.7'
+
+services:
+  pihole:
+    image: pihole/pihole:latest
+    env_file:
+      - pihole.env
+    volumes:
+      - '/home/dsb00/DockerSwarmConfig/pihole_vpn/pihole/etc-pihole/:/etc/pihole/'
+      - '/home/dsb00/DockerSwarmConfig/pihole_vpn/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8081:80/tcp"
+      - "8443:443/tcp"
+
+  pivpn:
+    image: linuxserver/wireguard:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - SERVERURL=dsbhome.mooo.com
+      - SERVERPORT=51820
+      - PEERS=10
+      - PEERDNS=192.168.0.123
+      - INTERNAL_SUBNET=10.13.13.0
+    volumes:
+      - '/home/dsb00/DockerSwarmConfig/pihole_vpn/pivpn/config:/config'
+      - '/lib/modules:/lib/modules'
+    ports:
+      - '51820:51820/udp'
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure

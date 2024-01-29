@@ -1,0 +1,86 @@
+# Create db.env with the following content:
+# MYSQL_ROOT_PASSWORD=your_root_password
+# MYSQL_PASSWORD=your_owncloud_password
+# MYSQL_DATABASE=owncloud
+# MYSQL_USER=owncloud
+# MARIADB_AUTO_UPGRADE=1
+
+# Create owncloud.env with the following content:
+# OWNCLOUD_DOMAIN=localhost:9090
+# OWNCLOUD_TRUSTED_DOMAINS=localhost, <ip address raspberry pi>
+# OWNCLOUD_DB_TYPE=mysql
+# OWNCLOUD_DB_NAME=your_owncloud_database_name
+# OWNCLOUD_DB_USERNAME=your_owncloud_database_username
+# OWNCLOUD_DB_PASSWORD=your_owncloud_database_password
+# OWNCLOUD_DB_HOST=your_owncloud_database_hostname
+# OWNCLOUD_ADMIN_USERNAME=your_owncloud_admin_username
+# OWNCLOUD_ADMIN_PASSWORD=your_owncloud_admin_password
+# OWNCLOUD_MYSQL_UTF8MB4=true
+# OWNCLOUD_REDIS_ENABLED=true  
+# OWNCLOUD_REDIS_HOST=redis
+
+# after reaching to folder path: docker compose down; docker compose up -d
+
+# To CREATE the stack:
+# docker stack deploy -c docker-compose.yml owncloud
+
+# To Remove the stack with data:
+# docker stack rm owncloud
+# sudo rm -rf /mnt/deep/files/*
+# sudo rm -rf /mnt/deep/mysql/*
+# sudo rm -rf /mnt/deep/redis/*
+
+version: "3"
+
+services:
+  owncloud:
+    image: owncloud/server:10.13
+    ports:
+      - 9090:8080
+    depends_on:
+      - mariadb
+      - redis
+    env_file:
+      - /home/dsb00/DockerSwarmConfig/owncloud/owncloud.env
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /mnt/deep/files:/mnt/data
+    deploy:
+      restart_policy: 
+        condition: on-failure
+
+  mariadb:
+    image: mariadb:10.11 # minimum required ownCloud version is 10.9
+    env_file:
+      - /home/dsb00/DockerSwarmConfig/owncloud/db.env
+    ports:
+      - 3306:3306
+    command: ["--max-allowed-packet=128M", "--innodb-log-file-size=64M"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -u root --password=$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /mnt/deep/mysql:/var/lib/mysql
+    deploy:
+      restart_policy: 
+        condition: on-failure
+
+  redis:
+    image: redis:6
+    command: ["--databases", "1"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /mnt/deep/redis:/data
+    deploy:
+      restart_policy: 
+        condition: on-failure
