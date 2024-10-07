@@ -180,3 +180,7 @@ cython_debug/
 
 # ignore vscode files
 *.vscode/
+
+*letsencrypt/
+*nginx/data/
+*actual-data/
