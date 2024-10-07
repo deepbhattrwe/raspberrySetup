@@ -184,5 +184,4 @@ cython_debug/
 *letsencrypt/
 *nginx/data/
 *actual-data/
-monitoring/grafana/data/
-monitoring/prometheus/data/
+*data/
