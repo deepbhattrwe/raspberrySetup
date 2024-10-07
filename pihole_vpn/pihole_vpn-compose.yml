@@ -1,8 +1,8 @@
-"""
-Create pihole.env file with the following content:
-TZ=Europe/Berlin
-WEBPASSWORD=<your password>
-"""
+
+# Create pihole.env file with the following content:
+# TZ=Europe/Berlin
+# WEBPASSWORD=<your password>
+
 # docker stack deploy -c pihole_vpn/pihole_vpn-compose.yml pihole_vpn
 
 version: '3.7'
@@ -23,7 +23,6 @@ services:
       restart_policy:
         condition: on-failure
     ports:
-      - "53:53/tcp"
       - "53:53/udp"
       - "67:67/udp"
       - "8081:80/tcp"
@@ -35,7 +34,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Berlin
-      - SERVERURL=dsbhome.mooo.com
+      - SERVERURL=shreep484.ddns.net
       - SERVERPORT=51820
       - PEERS=10
       - PEERDNS=192.168.0.123

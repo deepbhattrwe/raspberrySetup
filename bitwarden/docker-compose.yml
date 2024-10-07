@@ -1,0 +1,38 @@
+services:
+  bitwarden:
+    depends_on:
+      - db
+    env_file:
+      - settings.env
+    image: ${REGISTRY:-bitwarden}/self-host:${TAG:-beta}
+    restart: always
+    ports:
+      - "3001:8080"
+      - "3002:8443"
+    volumes:
+      - bitwarden:/etc/bitwarden
+      - logs:/var/log/bitwarden
+    networks:
+      - shared_network
+
+  db:
+    env_file:
+      - db.env
+    image: postgres:14
+    restart: always
+    ports:
+      - "5432:5432" # Use port 3307 on the host
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - shared_network
+
+volumes:
+  bitwarden:
+  logs:
+  data:
+
+
+networks:
+  shared_network:
+    external: true
