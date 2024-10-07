@@ -1,0 +1,99 @@
+"""
+Create monitoring.env file with the following content:
+INFLUXDB_USER=your_user
+INFLUXDB_PASSWORD=your_password
+"""
+# docker stack deploy -c monitoring/monitoring-stack.yml monitoring
+
+version: '3.7'
+
+services:
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - portainer_agent_network
+    deploy:
+      mode: global
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      NETWORKS: 1
+      VOLUMES: 1
+      TASKS: 1
+      SERVICES: 1
+      NODES: 1
+      SECRETS: 1
+      CONFIGS: 1
+      SYSTEM: 1
+      INFO: 1
+  
+  influxdb:
+    image: arm32v7/influxdb:1.8
+    volumes:
+      - influxdb:/var/lib/influxdb
+    networks:
+      - portainer_agent_network
+    ports:
+      - 8086:8086
+    env_file:
+      - /home/dsb00/DockerSwarmConfig/monitoring/monitoring.env
+    environment:
+      - INFLUXDB_DB=telegraf
+      - INFLUXDB_USER=${INFLUXDB_USER}
+      - INFLUXDB_USER_PASSWORD=${INFLUXDB_PASSWORD}
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  telegraf:
+    image: telegraf:latest
+    user: root
+    volumes:
+      - /:/hostfs:ro
+      - ./scripts/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./scripts/gpu_temp.txt:/gpu_temp.txt
+      - /sys/class/thermal/thermal_zone0/temp:/thermal_temp
+    networks:
+      - portainer_agent_network
+    deploy:
+      mode: global
+    depends_on:
+      - influxdb
+      - docker-socket-proxy
+    environment:
+      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_API_VERSION: 1.24
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana:/var/lib/grafana
+    networks:
+      - portainer_agent_network
+    ports:
+      - 3000:3000
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - influxdb
+
+  chronograf:
+    image: chronograf:1.8.10
+    networks:
+      - portainer_agent_network
+    ports:
+      - 8888:8888
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb:
+  grafana:
+  docker_sock:
+
+networks:
+  portainer_agent_network:
+    external: true
