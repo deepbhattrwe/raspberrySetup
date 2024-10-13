@@ -1,7 +1,7 @@
-"""
-Create portainer.env file with the following content:
-HEIMDALL_PASS=<your password>
-"""
+# """
+# Create portainer.env file with the following content:
+# HEIMDALL_PASS=<your password>
+# """
 # to deploy: docker stack deploy -c portainer-stack.yml portainer
 # to remove: docker stack rm portainer
 
