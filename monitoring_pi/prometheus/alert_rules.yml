@@ -1,0 +1,51 @@
+groups:
+- name: storage_alerts
+  rules:
+  - alert: HighDiskUsage
+    expr: node_filesystem_avail_bytes{mountpoint="/mnt/deep"} / node_filesystem_size_bytes{mountpoint="/mnt/deep"} < 0.1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Disk usage is above 90% on /mnt/deep"
+      description: "Disk usage on /mnt/deep is above 90% for more than 5 minutes."
+
+- name: container_alerts
+  rules:
+  - alert: ContainerDown
+    expr: absent(container_last_seen{job="cadvisor"}) == 1
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Container down alert"
+      description: "A container has been down for more than 1 minute."
+
+- name: system_alerts
+  rules:
+  - alert: HighCPUUsage
+    expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High CPU usage alert"
+      description: "CPU usage is above 80% for more than 5 minutes."
+
+  - alert: HighRAMUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High RAM usage alert"
+      description: "RAM usage is above 90% for more than 5 minutes."
+
+  - alert: HighTemperature
+    expr: node_hwmon_temp_celsius > 60
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High temperature alert"
+      description: "Temperature is above 60°C for more than 5 minutes."

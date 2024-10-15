@@ -30,27 +30,25 @@
 # sudo rm -rf /mnt/deep/mysql/*
 # sudo rm -rf /mnt/deep/redis/*
 
-version: "3"
-
 services:
   owncloud:
-    image: owncloud/server:10.13
+    image: owncloud/server:10.15
     ports:
       - 9090:8080
     depends_on:
       - mariadb
       - redis
     env_file:
-      - /home/dsb00/DockerSwarmConfig/owncloud/owncloud.env
+      - owncloud.env
     healthcheck:
-      test: ["CMD", "/usr/bin/healthcheck"]
+      test: [ "CMD", "/usr/bin/healthcheck" ]
       interval: 30s
       timeout: 10s
       retries: 5
     volumes:
       - /mnt/deep/files:/mnt/data
     deploy:
-      restart_policy: 
+      restart_policy:
         condition: on-failure
 
   mariadb:
@@ -59,28 +57,28 @@ services:
       - /home/dsb00/DockerSwarmConfig/owncloud/db.env
     ports:
       - 3306:3306
-    command: ["--max-allowed-packet=128M", "--innodb-log-file-size=64M"]
+    command: [ "--max-allowed-packet=128M", "--innodb-log-file-size=64M" ]
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -u root --password=$$MYSQL_ROOT_PASSWORD"]
+      test: [ "CMD-SHELL", "mysqladmin ping -u root --password=$$MYSQL_ROOT_PASSWORD" ]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - /mnt/deep/mysql:/var/lib/mysql
     deploy:
-      restart_policy: 
+      restart_policy:
         condition: on-failure
 
   redis:
-    image: redis:6
-    command: ["--databases", "1"]
+    image: redis
+    command: [ "--databases", "1" ]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - /mnt/deep/redis:/data
     deploy:
-      restart_policy: 
+      restart_policy:
         condition: on-failure
