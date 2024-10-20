@@ -3,7 +3,7 @@ peer2: Work Laptop
 peer3: Iphone
 peer4: Pixel8
 peer5: Home Laptop
-peer6:
+peer6: Hitul's phone
 peer7:
 peer8:
 peer9:

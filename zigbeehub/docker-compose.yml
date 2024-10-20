@@ -1,7 +1,6 @@
 # sudo docker compose up -d
 # sudo docker compose down
 
-version: '3.8'
 services:
   mqtt:
     image: eclipse-mosquitto:2.0
