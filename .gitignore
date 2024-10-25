@@ -185,3 +185,4 @@ cython_debug/
 *nginx/data/
 *actual-data/
 *data/
+*db/

@@ -22,7 +22,7 @@
 # after reaching to folder path: docker compose down; docker compose up -d
 
 # To CREATE the stack:
-# docker stack deploy -c docker-compose.yml owncloud
+# docker stack deploy -c owncloud/docker-compose.yml owncloud
 
 # To Remove the stack with data:
 # docker stack rm owncloud

@@ -37,8 +37,8 @@ services:
       - SERVERURL=shreep484.ddns.net
       - SERVERPORT=51820
       - PEERS=10
-      - PEERDNS=192.168.0.123
-      - INTERNAL_SUBNET=10.13.13.0
+      - PEERDNS=192.168.178.24
+      - INTERNAL_SUBNET=10.13.13.2
     volumes:
       - '/home/dsb00/DockerSwarmConfig/pihole_vpn/pivpn/config:/config'
       - '/lib/modules:/lib/modules'

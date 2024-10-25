@@ -6,9 +6,9 @@ services:
     restart: unless-stopped
     user: "472"
     networks:
-      - shared_network
+      - nginx_network_1
     ports:
-      - 3000:3000
+      - 3020:3000
     env_file:
       - ./grafana/.env
     volumes:
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     privileged: true
     networks:
-      - shared_network
+      - nginx_network_1
     expose:
       - 9070:8080
     command:
@@ -48,7 +48,7 @@ services:
     hostname: rpi-exporter
     restart: unless-stopped
     networks:
-      - shared_network
+      - nginx_network_1
     expose:
       - 9100:9100
     command:
@@ -76,7 +76,7 @@ services:
       # /!\ Uncomment the following line to set a size limit for the Prometheus database /!\
       #      - '--storage.tsdb.retention.size=10GB'
     networks:
-      - shared_network
+      - nginx_network_1
     expose:
       - 9099:9090
     volumes:
@@ -93,13 +93,14 @@ services:
   alertmanager:
     image: prom/alertmanager
     container_name: alertmanager
+    restart: unless-stopped
     volumes:
       - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml
     ports:
       - 9093:9093
     networks:
-      - shared_network
+      - nginx_network_1
 
 networks:
-  shared_network:
+  nginx_network_1:
     external: true
