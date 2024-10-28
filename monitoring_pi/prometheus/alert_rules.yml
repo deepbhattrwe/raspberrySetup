@@ -14,7 +14,7 @@ groups:
   rules:
   - alert: ContainerDown
     expr: absent(container_last_seen{job="cadvisor"}) == 1
-    for: 1m
+    for: 30s
     labels:
       severity: critical
     annotations:
@@ -25,7 +25,7 @@ groups:
   rules:
   - alert: HighCPUUsage
     expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
-    for: 5m
+    for: 2m
     labels:
       severity: critical
     annotations:
@@ -34,7 +34,7 @@ groups:
 
   - alert: HighRAMUsage
     expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
-    for: 5m
+    for: 2m
     labels:
       severity: critical
     annotations:
@@ -43,9 +43,20 @@ groups:
 
   - alert: HighTemperature
     expr: node_hwmon_temp_celsius > 60
-    for: 5m
+    for: 2m
     labels:
       severity: critical
     annotations:
       summary: "High temperature alert"
       description: "Temperature is above 60°C for more than 5 minutes."
+
+- name: test_alerts
+  rules:
+  - alert: TestAlert
+    expr: vector(1)
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Test alert"
+      description: "This is a test alert."

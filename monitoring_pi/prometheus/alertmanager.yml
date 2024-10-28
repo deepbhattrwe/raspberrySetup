@@ -6,8 +6,18 @@ global:
 
 route:
   receiver: 'email-notifications'
+  routes:
+    - receiver: 'telegram-notifications'
+  
 
 receivers:
 - name: 'email-notifications'
   email_configs:
   - to: 'dsb00715@gmail.com'
+
+- name: 'telegram-notifications'
+  telegram_configs:
+  - bot_token: '7895863728:AAEFMjR1hdf0P9q83geCz6-Wl6lpJB__Vjw'
+    chat_id: -1002435760497
+    send_resolved: true
+    parse_mode: 'HTML'
