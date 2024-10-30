@@ -1,20 +1,9 @@
-global:
-  smtp_smarthost: 'smtp.gmail.com:587'
-  smtp_from: 'dsb007152@gmail.com'
-  smtp_auth_username: 'dsb007152@gmail.com'
-  smtp_auth_password: 'yzlt grkp kaim lyqo'
-
 route:
-  receiver: 'email-notifications'
+  receiver: 'telegram-notifications'
   routes:
     - receiver: 'telegram-notifications'
-  
 
 receivers:
-- name: 'email-notifications'
-  email_configs:
-  - to: 'dsb00715@gmail.com'
-
 - name: 'telegram-notifications'
   telegram_configs:
   - bot_token: '7895863728:AAEFMjR1hdf0P9q83geCz6-Wl6lpJB__Vjw'
